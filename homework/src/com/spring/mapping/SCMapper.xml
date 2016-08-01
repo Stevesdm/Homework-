@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.dao.ScMapper">
+	<resultMap id="BaseResultMap" type="com.spring.model.Sc">
+		<id column="sc_id" property="sc_id" jdbcType="INTEGER" />
+		<result column="sno" property="sno" jdbcType="VARCHAR" />
+		<result column="sname" property="sname" jdbcType="VARCHAR" />
+		<result column="cno" property="cno" jdbcType="VARCHAR" />
+		<result column="sctimes" property="sctimes" jdbcType="INTEGER" />
+		<result column="scfilename" property="scfilename" jdbcType="VARCHAR" />
+		<result column="uploadtime" property="uploadtime" jdbcType="DATE" />
+		<result column="allowlook" property="allowlook" jdbcType="INTEGER" />
+		<result column="downloaded" property="downloaded" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		sc_id,sno,sname,cno,sctimes,scfilename,uploadtime,allowlook,downloaded
+	</sql>
+
+	<resultMap id="scfileResultMap" type="java.lang.String">
+		<result column="scfilename" property="scfilename" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectBysnocno" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select *
+		from sc
+		where sno=#{0} and cno=#{1}
+		order by sctimes desc;
+	</select>
+
+	<select id="Total" resultType="Integer" parameterType="java.lang.String">
+		select count(sc_id)
+		from sc
+		where sno=#{0} and cno=#{1};
+	</select>
+
+	<select id="getscFromsnocnoByPage" resultMap="BaseResultMap"
+		parameterType="java.util.Map">
+		select *
+		from sc
+		where sno=#{sno} and cno=#{cno}
+		order by sctimes desc
+		limit #{startRow},#{pageSize};
+	</select>
+
+	<select id="selectAllbykey" resultMap="scfileResultMap"
+		parameterType="java.util.Map">
+		select scfilename
+		from sc
+		where sno = #{sno}
+		and cno = #{cno}
+		and sctimes = #{sctimes}
+		order by sctimes desc;
+	</select>
+
+	<update id="updatebykey" parameterType="com.spring.model.Sc">
+		update sc
+		set scfilename=#{scfilename} ,uploadtime=#{uploadtime}
+		where sno=#{sno} and cno= #{cno} and sctimes=#{sctimes};
+	</update>
+
+	<insert id="insertSelective" parameterType="com.spring.model.Sc">
+		insert
+		into sc (sno,sname,cno,sctimes,scfilename,uploadtime)
+		values ( #{sno},#{sname},#{cno}, #{sctimes}, #{scfilename},#{uploadtime});
+	</insert>
+
+	<select id="totalBysclasstimes" resultType="Integer"
+		parameterType="java.util.Map">
+		select count(sc.sc_id)
+		from student,sc
+		where student.sno=sc.sno and smajor=#{smajor} and sclass=#{sclass} and
+		sctimes=#{sctimes} and cno=#{cno};
+	</select>
+
+	<select id="getscFromsclasstimesByPage" resultMap="BaseResultMap"
+		parameterType="java.util.Map">
+		select
+		sc.sc_id,sc.downloaded,cno,sc.sno,sc.sname,sctimes,scfilename,uploadtime,allowlook
+		from student,sc
+		where student.sno=sc.sno and smajor=#{smajor} and sclass=#{sclass} and
+		sctimes=#{sctimes} and cno=#{cno}
+		order by sctimes desc
+		limit #{startRow},#{pageSize};
+	</select>
+
+	<select id="TotalByName" resultType="Integer" parameterType="java.lang.String">
+		select count(sc_id)
+		from sc
+		where sname=#{0} and cno=#{1};
+	</select>
+
+	<select id="getscFromsnamecnoByPage" resultMap="BaseResultMap"
+		parameterType="java.util.Map">
+		select *
+		from sc
+		where sname=#{sname} and cno=#{cno}
+		order by sctimes desc
+		limit #{startRow},#{pageSize};
+	</select>
+
+	<select id="selectByscid" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select *
+		from sc
+		where sc_id=#{0};
+	</select>
+
+	<update id="downloaded" parameterType="Integer">
+		update sc
+		set downloaded=1
+		where sc_id=#{0};
+	</update>
+
+	<select id="getScByMajorClasTimes" resultMap="BaseResultMap"
+		parameterType="java.util.Map">
+		select sc.sc_id,sc.downloaded
+		from student,sc
+		where student.sno=sc.sno and smajor=#{smajor} and sclass=#{sclass} and
+		sctimes=#{sctimes} and cno=#{cno}
+		;
+	</select>
+
+	<select id="getScUnByMajorClasTimes" resultMap="BaseResultMap"
+		parameterType="java.util.Map">
+		select sc.sc_id,sc.downloaded
+		from student,sc
+		where student.sno=sc.sno and smajor=#{smajor} and sclass=#{sclass} and
+		sctimes=#{sctimes} and cno=#{cno} and downloaded!=1
+		;
+	</select>
+
+	<select id="getAllBySno" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select * from sc
+		where sno=#{0};
+	</select>
+
+	<delete id="deleteByScid" parameterType="java.lang.Integer">
+		delete from sc
+		where sc_id=#{0};
+	</delete>
+
+
+</mapper>

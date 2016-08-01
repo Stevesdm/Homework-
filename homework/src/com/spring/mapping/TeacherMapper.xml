@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.dao.TeacherMapper">
+	<resultMap id="BaseResultMap" type="com.spring.model.Teacher">
+		<id column="tid" property="tid" jdbcType="INTEGER" />
+		<result column="tno" property="tno" jdbcType="CHAR" />
+		<result column="tname" property="tname" jdbcType="VARCHAR" />
+		<result column="tpassword" property="tpassword" jdbcType="CHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		tid,tno,tname,tpassword
+	</sql>
+
+	<select id="getAll" resultMap="BaseResultMap">
+		select *
+		from teacher;
+	</select>
+
+	<select id="selectBytno" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select *
+		from teacher
+		where tno=#{0};
+	</select>
+
+	<update id="updatePassword" parameterType="java.lang.String">
+		update teacher
+		set tpassword=#{1}
+		where tno=#{0};
+	</update>
+
+	<insert id="addTeacher" parameterType="java.lang.String">
+		insert into teacher(tno,tname,tpassword)
+		values(#{0},#{1},#{2});
+	</insert>
+
+	<select id="selectListBytno" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select *
+		from teacher
+		where tno=#{0};
+	</select>
+
+	<select id="selectListByname" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select *
+		from teacher
+		where tname=#{0};
+	</select>
+
+	<delete id="deleteTeacher" parameterType="java.lang.Integer">
+		delete from teacher
+		where tid=#{0};
+	</delete>
+
+	<update id="updateTeacher" parameterType="java.lang.String">
+		update teacher
+		set tname=#{1}
+		where tno=#{0};
+	</update>
+</mapper>

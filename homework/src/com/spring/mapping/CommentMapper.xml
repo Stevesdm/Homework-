@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.dao.CommentMapper">
+	<resultMap id="BaseResultMap" type="com.spring.model.Comment">
+		<id column="comment_id" property="comment_id" jdbcType="INTEGER" />
+		<result column="sno" property="sno" jdbcType="CHAR" />
+		<result column="sctimes" property="sctimes" jdbcType="INTEGER" />
+		<result column="comment_time" property="comment_time" jdbcType="DATE" />
+		<result column="comment_score" property="comment_score"
+			jdbcType="CHAR" />
+		<result column="comment_content" property="comment_content"
+			jdbcType="CHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		comment_id,sno,sctimes,comment_time,comment_score,comment_content
+	</sql>
+
+
+
+</mapper>

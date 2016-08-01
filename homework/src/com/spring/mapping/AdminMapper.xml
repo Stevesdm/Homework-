@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.dao.AdminMapper">
+	<resultMap id="BaseResultMap" type="com.spring.model.Admin">
+		<id column="aid" property="aid" jdbcType="INTEGER" />
+		<result column="ano" property="ano" jdbcType="CHAR" />
+		<result column="aname" property="aname" jdbcType="CHAR" />
+		<result column="apassword" property="apassword" jdbcType="CHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		aid,ano,aname,apassword
+	</sql>
+
+	<select id="getAll" resultMap="BaseResultMap">
+		select *
+		from admin;
+	</select>
+
+	<select id="selectByAno" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select *
+		from admin
+		where ano=#{0};
+	</select>
+
+	<update id="updatePassword" parameterType="java.lang.String">
+		update admin
+		set apassword=#{1}
+		where ano=#{0};
+	</update>
+
+</mapper>

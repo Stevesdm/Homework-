@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.dao.ScDataMapper">
+	<resultMap id="BaseResultMap" type="com.spring.model.ScData">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="cno" property="cno" jdbcType="VARCHAR" />
+		<result column="smajor" property="smajor" jdbcType="VARCHAR" />
+		<result column="sgrade" property="sgrade" jdbcType="VARCHAR" />
+		<result column="sclass" property="sclass" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id,cno,smajor,sgrade,sclass
+	</sql>
+
+	<select id="getCLassByCno" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select * from scdata
+		where cno=#{0}
+	</select>
+
+	<select id="getMajorDistinct" resultMap="BaseResultMap">
+		select distinct smajor from scdata;
+	</select>
+
+	<select id="getGradeDistinct" resultMap="BaseResultMap">
+		select distinct sgrade from scdata;
+	</select>
+
+	<select id="getClassDistinct" resultMap="BaseResultMap">
+		select distinct sclass from scdata;
+	</select>
+
+	<select id="getAll" resultMap="BaseResultMap">
+		select * from scdata
+		where cno !='';
+	</select>
+
+	<delete id="deleteByid" parameterType="java.lang.Integer">
+		delete from scdata
+		where id=#{0};
+	</delete>
+
+	<insert id="addSetCourse" parameterType="com.spring.model.ScData">
+		insert into scdata(cno,smajor,sgrade,sclass)
+		values(#{cno},#{smajor},#{sgrade},#{sclass});
+	</insert>
+
+	<insert id="addMajorGradeClass" parameterType="com.spring.model.ScData">
+		insert into scdata(smajor,sgrade,sclass)
+		values(#{smajor},#{sgrade},#{sclass});
+	</insert>
+	
+	<select id="getStudentCourse" parameterType="java.lang.String" resultType="java.lang.String">
+		select distinct cno from scdata 
+		where smajor=#{0} and sgrade=#{1} ;
+	</select>
+
+</mapper>

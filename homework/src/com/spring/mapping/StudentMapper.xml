@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spring.dao.StudentMapper">
+	<resultMap id="BaseResultMap" type="com.spring.model.Student">
+		<id column="sid" property="sid" jdbcType="INTEGER" />
+		<result column="sno" property="sno" jdbcType="CHAR" />
+		<result column="spassword" property="spassword" jdbcType="CHAR" />
+		<result column="sname" property="sname" jdbcType="CHAR" />
+		<result column="smajor" property="smajor" jdbcType="CHAR" />
+		<result column="sgrade" property="sgrade" jdbcType="CHAR" />
+		<result column="sclass" property="sclass" jdbcType="CHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		sid,sno, spassword, sname, smajor, sgrade, sclass
+	</sql>
+
+	<select id="getAllStudents" resultMap="BaseResultMap">
+		select *
+		from student;
+	</select>
+
+	<select id="selectBysno" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select *
+		from student
+		where sno=#{0};
+	</select>
+
+	<update id="updatePassword" parameterType="java.lang.String">
+		update student
+		set spassword=#{1}
+		where sno=#{0};
+	</update>
+
+	<select id="getClassByMajorGrade" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select distinct sclass
+		from student
+		where smajor=#{0}
+		and sgrade=#{1};
+	</select>
+
+	<select id="selectUnupload" parameterType="java.util.Map"
+		resultType="Integer">
+		select count(*)
+		from student
+		where
+		smajor=#{smajor} and
+		sclass =#{sclass}
+		and sno not in (
+		select sno
+		from sc
+		where cno = #{cno} and sctimes = #{sctimes} );
+	</select>
+
+	<select id="selectUnuploadByPage" parameterType="java.util.Map"
+		resultMap="BaseResultMap">
+		select *
+		from student
+		where
+		smajor=#{smajor} and
+		sclass =#{sclass}
+		and sno not in (
+		select sno
+		from sc
+		where cno = #{cno} and sctimes = #{sctimes} )
+		limit #{startRow},#{pageSize};
+	</select>
+
+	<insert id="addStudent" parameterType="com.spring.model.Student">
+		insert into student(sno,spassword,sname,smajor,sgrade,sclass)
+		values(#{sno},#{spassword},#{sname},#{smajor},#{sgrade},#{sclass});
+	</insert>
+
+	<select id="selectListBysno" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select *
+		from student
+		where sno=#{0};
+	</select>
+
+	<select id="selectListByMajorClass" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select *
+		from student
+		where smajor=#{0}
+		and sclass=#{1};
+	</select>
+
+	<delete id="deleteStudent" parameterType="java.lang.Integer">
+		delete
+		from student
+		where sid=#{0};
+	</delete>
+
+	<update id="updateStudentInfo" parameterType="com.spring.model.Student">
+		update student
+		set
+		sname=#{sname},
+		smajor=#{smajor},
+		sgrade=#{sgrade},
+		sclass=#{sclass}
+		where sno=#{sno};
+	</update>
+
+	<update id="resetStuPwd" parameterType="java.lang.Integer">
+		update student
+		set
+		spassword='E10ADC3949BA59ABBE56E057F20F883E'
+		where sid=#{0};
+	</update>
+
+
+</mapper>
