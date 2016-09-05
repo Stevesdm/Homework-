@@ -59,36 +59,92 @@ public class StudentController {
 
 	@Resource
 	private ScService scService = null;
-	
+
 	@Resource
 	private ScDataService scdataService = null;
 
 	@Resource
 	private TaskService settaskService = null;
 
-	// 课程列表
+	/**
+	 * 返回到学生主页面
+	 * @param session
+	 * @return
+	 */
+	@RequestMapping(value = "/homepage", method = RequestMethod.GET)
+	public String returnhome(HttpSession session) {
+		return "student/mainpage";
+	}
+	
+	/**
+	 * 跳转到修改密码的页面
+	 * @param session
+	 * @return
+	 */
+	@RequestMapping(value = "/changepwd", method = RequestMethod.GET)
+	public String changePwd(HttpSession session) {
+		return "student/changePassword";
+	}
+	
+	/**
+	 * 跳转到学生课程列表页面，并显示该学生所学的所有课程
+	 * 
+	 * @param session
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/courseList", method = RequestMethod.GET)
 	public String CourseList(HttpSession session, Model model) {
 		Student s = (Student) session.getAttribute("user");
 		String grade = s.getSgrade();
 		String major = s.getSmajor();
-		List<Course> courseList=new ArrayList<Course>();
-		List conList=scdataService.getStudentCourse(major, grade);
-		Iterator it=conList.iterator();
-		while(it.hasNext()){
-			String cno=(String) it.next();
-			if(cno!=null){
-				Course c=(Course) courseService.selectBycno(cno);
+		List<Course> courseList = new ArrayList<Course>();
+		List conList = scdataService.getStudentCourse(major, grade);
+		Iterator it = conList.iterator();
+		while (it.hasNext()) {
+			String cno = (String) it.next();
+			if (cno != null) {
+				Course c = (Course) courseService.selectBycno(cno);
 				courseList.add(c);
 			}
-			
 		}
-		//List<Course> courseList = courseService.getCourseByGrade(major, grade);
 		model.addAttribute("courseList", courseList);
 		return "student/courseList";
 	}
 
-	// 跳转到交作业页面
+	/**
+	 * 跳转到课程资源页面，并显示出所有课程
+	 * @param session
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/resCourseList", method = RequestMethod.GET)
+	public String ResCourseList(HttpSession session, Model model) {
+		Student s = (Student) session.getAttribute("user");
+		String grade = s.getSgrade();
+		String major = s.getSmajor();
+		List<Course> courseList = new ArrayList<Course>();
+		List conList = scdataService.getStudentCourse(major, grade);
+		Iterator it = conList.iterator();
+		while (it.hasNext()) {
+			String cno = (String) it.next();
+			if (cno != null) {
+				Course c = (Course) courseService.selectBycno(cno);
+				courseList.add(c);
+			}
+		}
+		model.addAttribute("courseList", courseList);
+		return "student/CourseRecList";
+	}
+
+	/**
+	 * 跳转到上传作业页面，并查询出该课程作业内容，该学生之前上交的作业
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value = "/upload/{cno}", method = RequestMethod.GET)
 	public String upload(@PathVariable String cno, HttpSession session,
 			Model model, HttpServletRequest req) {
@@ -122,7 +178,14 @@ public class StudentController {
 		return "student/upload";
 	}
 
-	// 上传作业失败
+	/**
+	 * 上传作业失败，将失败信息返回到上传作业页面
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value = "/uploadError/{cno}", method = RequestMethod.GET)
 	public String uploaderror(@PathVariable String cno, HttpSession session,
 			Model model, HttpServletRequest req) {
@@ -157,7 +220,14 @@ public class StudentController {
 		return "student/upload";
 	}
 
-	// 上传作业成功
+	/**
+	 * 成功上传作业，返回课程列表页面，并且提示上传成功
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value = "/uploadSuccess/{cno}", method = RequestMethod.GET)
 	public String uploadsuccess(@PathVariable String cno, HttpSession session,
 			Model model, HttpServletRequest req) {
@@ -192,7 +262,59 @@ public class StudentController {
 		return "student/upload";
 	}
 
-	// 上传作业
+	/**
+	 * 成功更新已有的作业，返回到上传作业页面，并且提示
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
+	@RequestMapping(value = "/uploadUpdateSuccess/{cno}", method = RequestMethod.GET)
+	public String uploadUpdatesuccess(@PathVariable String cno,
+			HttpSession session, Model model, HttpServletRequest req) {
+		Student s = (Student) session.getAttribute("user");
+		String sno = s.getSno();
+		List<Task> tasklist = settaskService.getAll(cno);
+		Course course = courseService.selectBycno(cno);
+
+		model.addAttribute("message", "更新成功");
+		PageRoll pageroll = new PageRoll();
+
+		String currPage = req.getParameter("currPage");
+		if (currPage != null) {
+			pageroll.setCurrPage(Integer.parseInt(currPage));
+		}
+
+		int totalCount = scService.Total(sno, cno);// 总记录数
+		pageroll.setTotalCount(totalCount);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("sno", sno);
+		map.put("cno", cno);
+		map.put("startRow",
+				(pageroll.getCurrPage() - 1) * pageroll.getPageSize());
+		map.put("pageSize", pageroll.getPageSize());
+
+		List<Sc> sclistbypage = scService.getscFromsnocnoByPage(map);
+
+		model.addAttribute("course", course);
+		model.addAttribute("tasklist", tasklist);
+		model.addAttribute("pageroll", pageroll);
+		model.addAttribute("sclistbypage", sclistbypage);
+		return "student/upload";
+	}
+
+	/**
+	 * 更新作业判断逻辑代码，查看是否能正常更新作业
+	 * @param cno
+	 * @param attach
+	 * @param request
+	 * @param model
+	 * @param session
+	 * @return
+	 * @throws IOException
+	 * @throws UseException
+	 */
 	@RequestMapping(value = "/{cno}/upfile", method = RequestMethod.POST)
 	public String upfile(@PathVariable String cno,
 			@PathVariable MultipartFile attach, HttpServletRequest request,
@@ -236,31 +358,46 @@ public class StudentController {
 		} else {
 			System.out.println("文件夹存在");
 		}
-		File f = new File(realpath + "/" + attach.getOriginalFilename());
+
+		StringBuffer sb = new StringBuffer();
+		sb.append(sname);
+		sb.append("第");
+		sb.append(times);
+		sb.append("次作业");
+
+		// File f = new File(realpath + "/" + attach.getOriginalFilename());
+		File f = new File(realpath + "/" + sb.toString());
 		FileUtils.copyInputStreamToFile(attach.getInputStream(), f);
 
-		Sc sc = new Sc(sno, sname, cno, sctimes, attach.getOriginalFilename(),
-				date1);
+		// Sc sc = new Sc(sno, sname, cno, sctimes,
+		// attach.getOriginalFilename(),
+		// date1);
+		Sc sc = new Sc(sno, sname, cno, sctimes, sb.toString(), date1);
 
 		Map<String, Object> map2 = new HashMap<String, Object>();
-		System.out.println(sno+"  "+cno+"  "+sctimes);
-		
+		System.out.println(sno + "  " + cno + "  " + sctimes);
+
 		map2.put("sno", sno);
 		map2.put("cno", cno);
 		map2.put("sctimes", sctimes);
 		String record = scService.selectAllbykey(map2);
-		
+
 		if (record != null) {
 			scService.updatebykey(sc);
-			System.out.println("作业更新成功");
+			// System.out.println("作业更新成功");
+			return "redirect:/student/uploadUpdateSuccess/{cno}";
 		} else {
 			scService.insertSelective(sc);
-			System.out.println("作业上交成功");
+			// System.out.println("作业上交成功");
+			return "redirect:/student/uploadSuccess/{cno}";
 		}
-		return "redirect:/student/uploadSuccess/{cno}";
 	}
 
-	// 获取作业内容
+	/**
+	 * 上传作业页面ajax，根据作业次数，获取该次作业的全部内容
+	 * @param req
+	 * @param res
+	 */
 	@RequestMapping(value = "/getHomework", method = RequestMethod.POST)
 	public void getHomework(HttpServletRequest req, HttpServletResponse res) {
 		try {
@@ -292,7 +429,17 @@ public class StudentController {
 		}
 	}
 
-	// 单个下载作业
+	/**
+	 * 学生单个下载作业
+	 * @param sno
+	 * @param scfilename
+	 * @param cno
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/{sno}/download", method = RequestMethod.GET)
 	public String download(@PathVariable String sno, String scfilename,
 			String cno, HttpServletRequest request,
@@ -333,13 +480,13 @@ public class StudentController {
 		return null;
 	}
 
-	// 跳转到修改密码
-	@RequestMapping(value = "/changepwd", method = RequestMethod.GET)
-	public String changePwd(HttpSession session) {
-		return "student/changePassword";
-	}
-
-	// 修改密码
+	/**
+	 * 修改密码逻辑实现
+	 * @param session
+	 * @param req
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/changepwd", method = RequestMethod.POST)
 	public String changePassword(HttpSession session, HttpServletRequest req,
 			Model model) {
@@ -360,12 +507,6 @@ public class StudentController {
 			model.addAttribute("message", "密码修改成功");
 			return "student/changePassword";
 		}
-	}
-
-	// 回到主页
-	@RequestMapping(value = "/homepage", method = RequestMethod.GET)
-	public String returnhome(HttpSession session) {
-		return "student/mainpage";
 	}
 
 }

@@ -74,10 +74,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		                        <a class="page-scroll" href="student/courseList">课程</a>
 		                    </li>                    
 		                    <li>
-		                        <a class="page-scroll" href="build/underBuild">分享</a>
+		                        <a class="page-scroll" href="student/resCourseList">分享</a>
 		                    </li>                    
 		                    <li>
-		                        <a class="page-scroll" href="build/underBuild">社区</a>
+		                        <a class="page-scroll" href="http://www.snmqc.cn" target="_blank">社区</a>
 		                    </li>
 		                </ul>
 		            </div>
@@ -147,10 +147,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		                        <a class="page-scroll" href="student/courseList">课程</a>
 		                    </li>                    
 		                    <li>
-		                        <a class="page-scroll" href="build/underBuild">分享</a>
+		                        <a class="page-scroll" href="student/resCourseList">分享</a>
 		                    </li>                    
 		                    <li>
-		                        <a class="page-scroll" href="build/underBuild">社区</a>
+		                        <a class="page-scroll" href="http://www.snmqc.cn" target="_blank">社区</a>
 		                    </li>
 		                </ul>
 		            </div>

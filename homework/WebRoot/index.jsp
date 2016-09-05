@@ -77,7 +77,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		                        <a class="page-scroll" href="build/underBuild">分享</a>
 		                    </li>                    
 		                    <li>
-		                        <a class="page-scroll" href="build/underBuild">社区</a>
+		                        <a class="page-scroll" href="href="http://www.snmqc.cn" target="_blank"">社区</a>
 		                    </li>
 		                </ul>
 		            </div>
@@ -440,7 +440,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		
 		
 		<!-- 登陆块 -->
-		<div id="loginDiv" style="background-color:white;width:350px;height:300px;z-index:2;display:none;position:absolute;border-top:none;">
+		<div id="loginDiv" style="background-color:white;width:350px;height:300px;z-index:2;display:none;position:absolute;border-top:none;border:1px solid black">
 		    <div onmousedown="titleMove()" id="login_title" style="width:auto;height:45px;background-color:white;border:1px solid silver;border-left:none;border-right:none;border-top:none;margin:0px 15px 3px 15px;">
 					<div style="float: left;">
 						<h3>登陆</h3>

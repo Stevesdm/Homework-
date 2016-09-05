@@ -41,15 +41,16 @@ public class LoginController {
 			throws UseException {
 		String code = (String) request.getSession().getAttribute(
 				Constants.KAPTCHA_SESSION_KEY);
-		System.out.println(verifyCode + "  " + code);
 		if (verifyCode.equals(code)) {
-			switch (userno.length()) {
+			switch (userno.trim().length()) {
 			case 9:
+				
 				System.out.println("学生登录");
+				
 				List<Student> stulist = studentService.getAllStudents();
 				for (Student s : stulist) {
-					if (s.getSno().equals(userno)
-							&& s.getSpassword().equals(MD5Util.MD5(password))) {
+					if (s.getSno().equals(userno.trim())
+							&& s.getSpassword().trim().equals(MD5Util.MD5(password.trim()))) {
 						Student student = studentService.selectBysno(userno);
 						session.setAttribute("user", student);
 						System.out.println("登陆成功...");
@@ -62,8 +63,8 @@ public class LoginController {
 				System.out.println("教师登陆");
 				List<Teacher> tealist = teacherService.getAll();
 				for (Teacher t : tealist) {
-					if (t.getTno().equals(userno)
-							&& t.getTpassword().equals(MD5Util.MD5(password))) {
+					if (t.getTno().equals(userno.trim())
+							&& t.getTpassword().equals(MD5Util.MD5(password.trim()))) {
 						Teacher teacher = teacherService.selectBytno(userno);
 						session.setAttribute("user", teacher);
 						System.out.println("登陆成功...");
@@ -75,11 +76,11 @@ public class LoginController {
 				System.out.println("管理员登陆");
 				List<Admin> adminlist = adminService.getAll();
 				for (Admin t : adminlist) {
-					if (t.getAno().equals(userno)
-							&& t.getApassword().equals(MD5Util.MD5(password))) {
+					if (t.getAno().equals(userno.trim())
+							&& t.getApassword().equals(MD5Util.MD5(password.trim()))) {
 						Admin admin = adminService.selectByAno(userno);
 						session.setAttribute("user", admin);
-						System.out.println("登陆成功...");
+						System.out.println(admin.getAname()+"登陆成功...");
 						return "admin/mainpage";
 					}
 				}
@@ -105,7 +106,6 @@ public class LoginController {
 		String path = request.getContextPath();
 		String basePath = request.getScheme() + "://" + request.getServerName()
 				+ ":" + request.getServerPort() + path + "/";
-		System.out.println(basePath);
 		return "redirect:" + basePath;
 	}
 }
