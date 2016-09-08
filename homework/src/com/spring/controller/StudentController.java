@@ -40,6 +40,7 @@ import com.spring.model.Sc;
 import com.spring.model.Student;
 import com.spring.model.Task;
 import com.spring.service.CourseService;
+import com.spring.service.ResourceService;
 import com.spring.service.ScDataService;
 import com.spring.service.ScService;
 import com.spring.service.StudentService;
@@ -66,8 +67,12 @@ public class StudentController {
 	@Resource
 	private TaskService settaskService = null;
 
+	@Resource
+	private ResourceService resourceService = null;
+
 	/**
 	 * 返回到学生主页面
+	 * 
 	 * @param session
 	 * @return
 	 */
@@ -75,9 +80,10 @@ public class StudentController {
 	public String returnhome(HttpSession session) {
 		return "student/mainpage";
 	}
-	
+
 	/**
 	 * 跳转到修改密码的页面
+	 * 
 	 * @param session
 	 * @return
 	 */
@@ -85,7 +91,7 @@ public class StudentController {
 	public String changePwd(HttpSession session) {
 		return "student/changePassword";
 	}
-	
+
 	/**
 	 * 跳转到学生课程列表页面，并显示该学生所学的所有课程
 	 * 
@@ -114,6 +120,7 @@ public class StudentController {
 
 	/**
 	 * 跳转到课程资源页面，并显示出所有课程
+	 * 
 	 * @param session
 	 * @param model
 	 * @return
@@ -139,6 +146,7 @@ public class StudentController {
 
 	/**
 	 * 跳转到上传作业页面，并查询出该课程作业内容，该学生之前上交的作业
+	 * 
 	 * @param cno
 	 * @param session
 	 * @param model
@@ -180,6 +188,7 @@ public class StudentController {
 
 	/**
 	 * 上传作业失败，将失败信息返回到上传作业页面
+	 * 
 	 * @param cno
 	 * @param session
 	 * @param model
@@ -222,6 +231,7 @@ public class StudentController {
 
 	/**
 	 * 成功上传作业，返回课程列表页面，并且提示上传成功
+	 * 
 	 * @param cno
 	 * @param session
 	 * @param model
@@ -264,6 +274,7 @@ public class StudentController {
 
 	/**
 	 * 成功更新已有的作业，返回到上传作业页面，并且提示
+	 * 
 	 * @param cno
 	 * @param session
 	 * @param model
@@ -306,6 +317,7 @@ public class StudentController {
 
 	/**
 	 * 更新作业判断逻辑代码，查看是否能正常更新作业
+	 * 
 	 * @param cno
 	 * @param attach
 	 * @param request
@@ -365,13 +377,9 @@ public class StudentController {
 		sb.append(times);
 		sb.append("次作业");
 
-		// File f = new File(realpath + "/" + attach.getOriginalFilename());
 		File f = new File(realpath + "/" + sb.toString());
 		FileUtils.copyInputStreamToFile(attach.getInputStream(), f);
 
-		// Sc sc = new Sc(sno, sname, cno, sctimes,
-		// attach.getOriginalFilename(),
-		// date1);
 		Sc sc = new Sc(sno, sname, cno, sctimes, sb.toString(), date1);
 
 		Map<String, Object> map2 = new HashMap<String, Object>();
@@ -384,7 +392,6 @@ public class StudentController {
 
 		if (record != null) {
 			scService.updatebykey(sc);
-			// System.out.println("作业更新成功");
 			return "redirect:/student/uploadUpdateSuccess/{cno}";
 		} else {
 			scService.insertSelective(sc);
@@ -395,6 +402,7 @@ public class StudentController {
 
 	/**
 	 * 上传作业页面ajax，根据作业次数，获取该次作业的全部内容
+	 * 
 	 * @param req
 	 * @param res
 	 */
@@ -431,6 +439,7 @@ public class StudentController {
 
 	/**
 	 * 学生单个下载作业
+	 * 
 	 * @param sno
 	 * @param scfilename
 	 * @param cno
@@ -482,6 +491,7 @@ public class StudentController {
 
 	/**
 	 * 修改密码逻辑实现
+	 * 
 	 * @param session
 	 * @param req
 	 * @param model
@@ -507,6 +517,84 @@ public class StudentController {
 			model.addAttribute("message", "密码修改成功");
 			return "student/changePassword";
 		}
+	}
+
+	@RequestMapping(value = "/courseRecPage/{cno}", method = RequestMethod.GET)
+	public String returnCourseRecPage(@PathVariable String cno, Model model,
+			HttpServletRequest req) {
+
+		// 分页
+		PageRoll pageroll = new PageRoll();
+
+		String currPage = req.getParameter("currPage");
+		if (currPage != null) {
+			pageroll.setCurrPage(Integer.parseInt(currPage));
+		}
+
+		int totalRec = resourceService.totalRec(cno);// 总记录数
+
+		pageroll.setTotalCount(totalRec);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("cno", cno);
+		map.put("startRow",
+				(pageroll.getCurrPage() - 1) * pageroll.getPageSize());
+		map.put("pageSize", pageroll.getPageSize());
+
+		List<com.spring.model.Resource> recListBypage = resourceService
+				.getReclistByPage(map);
+
+		model.addAttribute("cno", cno);
+		model.addAttribute("pageroll", pageroll);
+		model.addAttribute("recListBypage", recListBypage);
+
+		return "student/CourseRecPage";
+	}
+
+	@RequestMapping(value = "/{cno}/downRec", method = RequestMethod.GET)
+	public String download(@PathVariable String cno, String id,
+			HttpServletRequest request, HttpServletResponse response,
+			Model model) throws Exception {
+		response.setContentType("text/html;charset=utf-8");
+		request.setCharacterEncoding("utf-8");
+		BufferedInputStream bis = null;
+		BufferedOutputStream bos = null;
+		String ctxPath = request.getSession().getServletContext()
+				.getRealPath("/resource/courseRec")
+				+ cno;
+		
+		com.spring.model.Resource r=resourceService.getRecById(Integer.parseInt(id));
+		String recName=r.getrecname();
+		int downtimes=r.getDowntimes();
+		
+		downtimes++;
+		
+		String downLoadPath = ctxPath + "/" + recName;
+
+		try {
+			long fileLength = new File(downLoadPath).length();
+			response.setContentType("application/x-msdownload;");
+			response.setHeader("Content-disposition", "attachment; filename="
+					+ new String(recName.getBytes("utf-8"), "ISO8859-1"));
+			response.setHeader("Content-Length", String.valueOf(fileLength));
+			bis = new BufferedInputStream(new FileInputStream(downLoadPath));
+			bos = new BufferedOutputStream(response.getOutputStream());
+			byte[] buff = new byte[2048];
+			int bytesRead;
+			while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+				bos.write(buff, 0, bytesRead);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			model.addAttribute("bos", bos);
+			if (bis != null)
+				bis.close();
+			if (bos != null)
+				bos.close();
+		}
+		//更新下载次数
+		resourceService.updateDowntimes(downtimes, Integer.parseInt(id));
+		return null;
 	}
 
 }

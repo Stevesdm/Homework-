@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import com.spring.model.Student;
 import com.spring.model.Task;
 import com.spring.model.Teacher;
 import com.spring.service.CourseService;
+import com.spring.service.ResourceService;
 import com.spring.service.ScDataService;
 import com.spring.service.ScService;
 import com.spring.service.StudentService;
@@ -63,19 +65,50 @@ public class TeacherController {
 	@Resource
 	private ScDataService scDataService = null;
 
-	// 跳转到设置作业界面
+	@Resource
+	private ResourceService resourceService = null;
+
+	/**
+	 * 跳转到教师主页
+	 * @return
+	 */
 	@RequestMapping(value = "/homepage")
 	public String homepage() {
 		return "teacher/mainpage";
 	}
 
-	// 跳转到修改密码
+	/**
+	 * 教师进入课程资源下载页面
+	 * @param session
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/courseRecList", method = RequestMethod.GET)
+	public String CourseRecList(HttpSession session, Model model) {
+		Teacher t = (Teacher) session.getAttribute("user");
+		String tno = t.getTno();
+		List<Course> courseList = courseService.getCourseByTno(tno);
+		model.addAttribute("courseList", courseList);
+		return "teacher/courseRecList";
+	}
+
+	/**
+	 * 跳转到修改密码页面
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(value = "/changepwd", method = RequestMethod.GET)
 	public String changePwd(HttpSession session) {
 		return "teacher/changePassword";
 	}
 
-	// 修改密码
+	/**
+	 * 修改教师密码
+	 * @param session
+	 * @param req
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/changepwd", method = RequestMethod.POST)
 	public String changePassword(HttpSession session, HttpServletRequest req,
 			Model model) {
@@ -98,7 +131,12 @@ public class TeacherController {
 		}
 	}
 
-	// 课程列表
+	/**
+	 * 展示所有课程
+	 * @param session
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/courseList", method = RequestMethod.GET)
 	public String CourseList(HttpSession session, Model model) {
 		Teacher t = (Teacher) session.getAttribute("user");
@@ -108,7 +146,14 @@ public class TeacherController {
 		return "teacher/courseList";
 	}
 
-	// 跳转到查看作业页面
+	/**
+	 * 进入查看作业页面
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value = "/lookHomework/{cno}", method = RequestMethod.GET)
 	public String upload(@PathVariable String cno, HttpSession session,
 			Model model, HttpServletRequest req) {
@@ -128,7 +173,14 @@ public class TeacherController {
 		return "teacher/lookHomework";
 	}
 
-	// 跳转到查看作业页面---按照班级查询
+	/**
+	 * 按照班级查询作业
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value = "/lookHomeworkByClass/{cno}")
 	public String lookHomeworkByClass(@PathVariable String cno,
 			HttpSession session, Model model, HttpServletRequest req) {
@@ -183,7 +235,15 @@ public class TeacherController {
 		return "teacher/lookHomeworkByClass";
 	}
 
-	// 跳转到查看作业页面---按照学号查询
+
+	/**
+	 * 按照学号查询作业
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value = "/lookHomeworkByNo/{cno}")
 	public String lookHomeworkByNo(@PathVariable String cno,
 			HttpSession session, Model model, HttpServletRequest req) {
@@ -223,7 +283,14 @@ public class TeacherController {
 		return "teacher/lookHomeworkByNo";
 	}
 
-	// 跳转到查看作业页面---按照姓名查询
+	/**
+	 * 按照信命查询作业
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value = "/lookHomeworkByName/{cno}")
 	public String lookHomeworkByName(@PathVariable String cno,
 			HttpSession session, Model model, HttpServletRequest req) {
@@ -264,7 +331,14 @@ public class TeacherController {
 		return "teacher/lookHomeworkByName";
 	}
 
-	// 跳转到查看作业页面---按班级未交作业查询
+	/**
+	 * 查看未交作业名单
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value = "/lookHomeworkUnupload/{cno}")
 	public String lookHomeworkUnupload(@PathVariable String cno,
 			HttpSession session, Model model, HttpServletRequest req) {
@@ -319,7 +393,14 @@ public class TeacherController {
 		return "teacher/lookHomeworkByUnupload";
 	}
 
-	// 跳转到设置作业界面
+	/**
+	 * 跳转到设置作业页面
+	 * @param cno
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value = "/setTask/{cno}")
 	public String setTask(@PathVariable String cno, HttpSession session,
 			Model model, HttpServletRequest req) {
@@ -331,7 +412,17 @@ public class TeacherController {
 		return "teacher/setTask";
 	}
 
-	// 添加作业
+	/**
+	 * 设置作业
+	 * @param cno
+	 * @param homeworkFile
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 * @throws IOException
+	 * @throws UseException
+	 */
 	@RequestMapping(value = "/addTask/{cno}")
 	public String addTask(@PathVariable String cno,
 			@PathVariable MultipartFile homeworkFile, HttpSession session,
@@ -426,7 +517,17 @@ public class TeacherController {
 		}
 	}
 
-	// 修改作业
+	/**
+	 * 修改作业
+	 * @param cno
+	 * @param homeworkFile
+	 * @param session
+	 * @param model
+	 * @param req
+	 * @return
+	 * @throws IOException
+	 * @throws UseException
+	 */
 	@RequestMapping(value = "/updateTask/{cno}")
 	public String updateTask(@PathVariable String cno,
 			@PathVariable MultipartFile homeworkFile, HttpSession session,
@@ -503,7 +604,16 @@ public class TeacherController {
 		}
 	}
 
-	// task_file文件的下载
+	/**
+	 * 下载作业附件
+	 * @param cno
+	 * @param taskfilename
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/download/{cno}", method = RequestMethod.GET)
 	public String downloadTask(@PathVariable String cno, String taskfilename,
 			HttpServletRequest request, HttpServletResponse response,
@@ -544,7 +654,16 @@ public class TeacherController {
 		return null;
 	}
 
-	// 作业文件单个下载
+	/**
+	 * 下载单个文件
+	 * @param sno
+	 * @param scfilename
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/{sno}/download", method = RequestMethod.GET)
 	public String download(@PathVariable String sno, String scfilename,
 			HttpServletRequest request, HttpServletResponse response,
@@ -593,7 +712,11 @@ public class TeacherController {
 		return null;
 	}
 
-	// 作业文件批量下载
+	/**
+	 * 批量下载作业
+	 * @param req
+	 * @param res
+	 */
 	@RequestMapping(value = "downloadAll", method = RequestMethod.POST)
 	public void downloadAll(HttpServletRequest req, HttpServletResponse res) {
 		String[] fileSelected = req.getParameterValues("fileSelected");
@@ -620,7 +743,11 @@ public class TeacherController {
 		}
 	}
 
-	// 下载本班本次全部作业
+	/**
+	 * 下载本班本次全部作业
+	 * @param req
+	 * @param res
+	 */
 	@RequestMapping(value = "downloadAllByclass", method = RequestMethod.GET)
 	public void downloadAllByclass(HttpServletRequest req,
 			HttpServletResponse res) {
@@ -660,7 +787,11 @@ public class TeacherController {
 		}
 	}
 
-	// 下载本班本次未下载过的作业
+	/**
+	 * 下载本班本次未下载的作业
+	 * @param req
+	 * @param res
+	 */
 	@RequestMapping(value = "downloadUnByclass", method = RequestMethod.GET)
 	public void downloadUnByclass(HttpServletRequest req,
 			HttpServletResponse res) {
@@ -698,4 +829,124 @@ public class TeacherController {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 进入上传资源页面
+	 * @param cno
+	 * @param message
+	 * @param model
+	 * @param req
+	 * @return
+	 */
+	@RequestMapping(value="uploadRecPage/{cno}", method = RequestMethod.GET)
+	public String uploadRecPage(@PathVariable String cno, String message,Model model,
+			HttpServletRequest req){
+		PageRoll pageroll = new PageRoll();
+
+		String currPage = req.getParameter("currPage");
+		if (currPage != null) {
+			pageroll.setCurrPage(Integer.parseInt(currPage));
+		}
+
+		int totalRec = resourceService.totalRec(cno);// 总记录数
+
+		pageroll.setTotalCount(totalRec);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("cno", cno);
+		map.put("startRow",
+				(pageroll.getCurrPage() - 1) * pageroll.getPageSize());
+		map.put("pageSize", pageroll.getPageSize());
+
+		List<com.spring.model.Resource> recListBypage = resourceService
+				.getReclistByPage(map);
+
+		model.addAttribute("cno", cno);
+		model.addAttribute("pageroll", pageroll);
+		model.addAttribute("recListBypage", recListBypage);
+		
+		if(message!=null && message!=""){
+			if(message.equals("success")){
+				model.addAttribute("message","成功上传课程资源");
+			}else if(message.equals("fail")){
+				model.addAttribute("message","上传失败");
+			}
+			else if(message.equals("dels")){
+				model.addAttribute("message","成功删除资源");
+			}else if(message.equals("delf")){
+				model.addAttribute("message","删除资源错误");
+			}
+		}
+		return "teacher/uploadRecPage";
+	}
+	
+	/**
+	 * 上传课程资源
+	 * @param cno
+	 * @param attach
+	 * @param request
+	 * @param model
+	 * @param session
+	 * @return
+	 * @throws IOException
+	 * @throws UseException
+	 */
+	@RequestMapping(value = "/{cno}/uploadRec", method = RequestMethod.POST)
+	public String upfile(@PathVariable String cno,
+			@PathVariable MultipartFile attach, HttpServletRequest request,
+			Model model, HttpSession session) throws IOException, UseException {
+		Teacher t = (Teacher) session.getAttribute("user");
+		
+		//文件无效
+		if (attach.getOriginalFilename() == "") {
+			throw new UseException("文件不能为空");
+		}
+
+		String realpath = request.getSession().getServletContext()
+				.getRealPath("/resource/courseRec")
+				+ cno;
+
+		File file = new File(realpath);
+		if (!file.exists() && !file.isDirectory()) {
+			//文件不存在，已创建
+			file.mkdirs();
+		} 
+		String fileName=attach.getOriginalFilename();
+		File f = new File(realpath + "/" + fileName);
+		FileUtils.copyInputStreamToFile(attach.getInputStream(), f);
+		//把资源信息insert到数据库中
+		java.util.Date date = new java.util.Date();
+		java.sql.Date uploadTime = new java.sql.Date(date.getTime());
+		com.spring.model.Resource r=new com.spring.model.Resource(fileName, t.getTname(), uploadTime, cno, 0);
+		int flag=resourceService.uploadRec(r);
+		String message;
+		if(flag==1){
+			message="success";
+		}else{
+			message="fail";
+		}
+		return "redirect:/teacher/uploadRecPage/{cno}?message="+message;
+	}
+	
+	
+	/**
+	 * 删除课程资源
+	 * @param id
+	 * @param cno
+	 * @return
+	 */
+	@RequestMapping(value = "/deleteRec/{cno}", method = RequestMethod.GET)
+	public String deleteRec(String id,@PathVariable String cno){
+		
+		System.out.println(id+"0000....00");
+		int rid=Integer.parseInt(id);
+		int flag=resourceService.delete(rid);
+		String message;
+		if(flag==1){
+			message="dels";
+		}else{
+			message="delf";
+		}
+		return "redirect:/teacher/uploadRecPage/{cno}?message="+message;
+	}
+	
 }

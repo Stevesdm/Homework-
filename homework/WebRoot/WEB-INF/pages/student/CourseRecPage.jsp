@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -28,6 +29,18 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				font-size:12px;
 				margin-bottom:28px;
 			}
+		.resListHead th{
+			text-align:center;
+		}
+		
+		.resList{
+			height:30px;
+			font-size:14 px;
+		}
+		.resList td{
+			text-align:center;
+		}
+		
 	</style>
 	
 	<!-- Favicons
@@ -53,8 +66,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	    ================================================== -->
 	<link rel="stylesheet" type="text/css"  href="<%=basePath%>/css/style.css">
 	<link rel="stylesheet" type="text/css" href="<%=basePath%>/css/prettyPhoto.css">
-	<link href='http://fonts.useso.com/css?family=Lato:400,700,900,300' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.useso.com/css?family=Open+Sans:400,700,800,600,300' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="js/modernizr.custom.js"></script>
 	<!--
 	作者：stevejobson@163.com
@@ -142,13 +153,33 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<div style="display:block;clear:both;">
 				<!-- 课程部分 -->
 				<div style="width:100%;border:1px solid #edf1f2;background-color:#fff;float:left;margin-top:30px;margin-bottom:50px;">
-					<div style="padding:10px 50px 40px;" class="us">
+					<div style="padding:10px 50px 40px;height:518px" class="us">
 						<p style="font-size:18px;line-height:49px;margin-bottom:2.1em;border-bottom:1px solid #eceff0;color:#363d40;">课程资源下载</p>
 						<!-- 课程资源列表 -->
-					
-					
-					
+							<table border="1px solid" style="width:100%">
+								<tr class="resListHead" style="height:48px;font-size:28px;">
+									<th style="width:30%;">资源名称</th>
+									<th style="width:20%;">上传者</th>
+									<th style="width:20$;">上传时间</th>
+									<th style="width:20%;">下载次数</th>
+									<th style="width:10%;">下载</th>
+								</tr>	
+								<c:forEach  items="${recListBypage }" var="r">
+				         			<tr class="reslist">
+						   				<td>${r.recname}</td>
+						   				<td>${r.uploader }</td>
+						   				<td><fmt:formatDate value="${r.uploadtime}"  type="date" dateStyle="default"/></td>
+						   				<td>${r.downtimes }</td>
+						   				<td><a href="student/${r.cno}/downRec?id=${r.id}" ><img src="./img/download1.jpg" width="20px" height="20px" ></a></td>
+					       			</tr>
+				   				</c:forEach>						
+							</table>
 					</div>
+					<div style="margin-left:30%;">
+         				<jsp:include page="/WEB-INF/pages/util/pageroll.jsp">
+         					<jsp:param value="student/courseRecPage/${cno}" name="action"/>
+         				</jsp:include>
+         			</div>
 				</div>	
 			</div>
 		</div>		
@@ -202,17 +233,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<div class="form-group">
 							<button type="button" class="btn btn-danger btn-block" onclick="loginModel()">登陆</button>
 					</div>	
-					<!-- 
-					<div style="height: 45px;width: auto;margin:10px 15px 3px 15px;">
-						<div class="sharesheet">
-							<ul class="sharesheet-links list-inline">
-							<li><a href="#nogo"><i class="fa fa-weibo"></i></a></li>
-							<li><a href="#nogo"><i class="fa fa-weixin"></i></a></li>
-							<li><a href="#nogo"><i class="fa fa-qq"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					 -->
 				</form>
 		    </div>
 		</div>

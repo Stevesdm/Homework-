@@ -53,8 +53,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	    ================================================== -->
 	<link rel="stylesheet" type="text/css"  href="<%=basePath%>/css/style.css">
 	<link rel="stylesheet" type="text/css" href="<%=basePath%>/css/prettyPhoto.css">
-	<link href='http://fonts.useso.com/css?family=Lato:400,700,900,300' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.useso.com/css?family=Open+Sans:400,700,800,600,300' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="js/modernizr.custom.js"></script>
 	<!--
 	作者：stevejobson@163.com
@@ -152,7 +150,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								
 								<!-- 需要修改的地方 -->
 								
-								 <a href="student/upload/${course.cno}"><button type="button" class="btn btn-primary btn-lg">进入课程</button></a>
+								 <a href="student/courseRecPage/10001"><button type="button" class="btn btn-primary btn-lg">课程资源</button></a>
 							</div>
 						</c:forEach>
 					</div>
@@ -209,17 +207,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<div class="form-group">
 							<button type="button" class="btn btn-danger btn-block" onclick="loginModel()">登陆</button>
 					</div>	
-					<!-- 
-					<div style="height: 45px;width: auto;margin:10px 15px 3px 15px;">
-						<div class="sharesheet">
-							<ul class="sharesheet-links list-inline">
-							<li><a href="#nogo"><i class="fa fa-weibo"></i></a></li>
-							<li><a href="#nogo"><i class="fa fa-weixin"></i></a></li>
-							<li><a href="#nogo"><i class="fa fa-qq"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					 -->
 				</form>
 		    </div>
 		</div>
