@@ -937,7 +937,6 @@ public class TeacherController {
 	@RequestMapping(value = "/deleteRec/{cno}", method = RequestMethod.GET)
 	public String deleteRec(String id,@PathVariable String cno){
 		
-		System.out.println(id+"0000....00");
 		int rid=Integer.parseInt(id);
 		int flag=resourceService.delete(rid);
 		String message;
